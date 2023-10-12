@@ -3,10 +3,10 @@ import './globals.css'
 import Form from './components/Form'
 import Image from 'next/image'
 
-// export const metadata = {
-//   title: '',
-//   description: '',
-// }
+export const metadata = {
+  title: 'Foodie Mapper | Find Restaurants In Any City Around The World !',
+  description: 'Foodie Mapper scrapes Google Maps to find restaurants in the city of your destination',
+}
 
 export default function RootLayout({ children }) {
   return (
@@ -25,7 +25,7 @@ export default function RootLayout({ children }) {
 
         <Form />
         
-        <div className='my-16 bg-red-500 rounded-lg'>{children}</div>
+        <div className='my-16 rounded-lg'>{children}</div>
 
       </body>
     </html>
