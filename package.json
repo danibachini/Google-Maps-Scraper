@@ -2,6 +2,7 @@
   "name": "google_maps_scraper",
   "version": "0.1.0",
   "private": true,
+
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,6 +12,7 @@
   "dependencies": {
     "cities.json": "^1.1.25",
     "next": "13.5.4",
+    "puppeteer": "^21.3.8",
     "react": "^18",
     "react-dom": "^18"
   },

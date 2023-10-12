@@ -2,7 +2,7 @@
 'use client';
 import { useState } from "react";
 import cities from 'cities.json';
-import SearchButton from "./SearchButton";
+import { scraper } from "../api/scraper/route";
 
 export default function Form() {
     const list = ['Barbecue', 'Vegetarian', 'Vegan', 'Pizza', 'Cafe', 'Sea Food', 'Street Food', 'Fast Food', 'Sushi', 
@@ -15,6 +15,7 @@ export default function Form() {
     const [search, setSearch] = useState(false);
     const [range, setRange] = useState(15);
 
+    // set true/false for displaying the dropdown with the cities options
     const onChange = (e) => {
         setValue(e.target.value);
         if (openCity===false) {
@@ -22,14 +23,44 @@ export default function Form() {
         }
     }
 
+    // set the range provided by the user
     const handleRangeChange = (event) => {
         const newValue = parseInt(event.target.value, 10);
         setRange(newValue);
     };
 
+    // handle the submit: check if all input provided by the user are correct and send them to the API
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        const checkCity = value.split(', ');
+        const correctCity = cityExists(checkCity[0], checkCity[1]);
+
+        if (buttonName !== '' && list.includes(buttonName) && value !== '' && correctCity && range !== '' && Number.isInteger(range)) {
+            const data = {
+                cuisine: buttonName, 
+                city: checkCity[0], 
+                country: checkCity[1],
+                amount: range
+            }
+            scraper(data);
+    
+        } else {
+            // throw error <<<<<<<<<<<<<-------------------------------------------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!
+            console.log('not yet');
+        }
+    }
+
+    // return true if city and country do exist in the json to prevent mispelled or unwanted data
+    function cityExists(cityName, countryCode) {
+        return cities.some(place => place.name === cityName && place.country === countryCode);
+    }
+
     return (
-        <>
+        <form onSubmit={handleSubmit}>
             <div className="mt-16 md:mt-36 flex flex-wrap gap-4 justify-around items-center">
+
+                {/* dropdown to select cuisine */}
                 <div>
                     <label 
                     className="my-1 w-52 btn border-none bg-white hover:bg-slate-400 text-zinc-600 hover:text-white" 
@@ -52,6 +83,7 @@ export default function Form() {
                     }
                 </div>
 
+                {/* input with auto-complete to select city/country */}
                 <div>
                     <input 
                     required 
@@ -87,6 +119,7 @@ export default function Form() {
                     <p className="text-white ">Amount of Options:</p>
                 </div>
 
+                {/* range to select how many restaurants to display - min of 5 and max of 30 */}
                 <div>
                     <input type="range" min={5} max="30" value={range} onChange={handleRangeChange} className="range" step="5" />
                     <div className="w-52 flex justify-between text-xs px-2 text-white">
@@ -102,9 +135,14 @@ export default function Form() {
             </div>
 
             <div className="text-center my-14">
-                <SearchButton food={buttonName} city={value} amount={range} />
+                <button
+                type="submit"
+                className="btn border-none text-teal-800 bg-amber-400 hover:bg-amber-500"
+                >
+                    Search
+                </button>
             </div>
 
-        </>
+        </form>
     )
 }
