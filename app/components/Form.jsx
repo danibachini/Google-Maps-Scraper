@@ -2,7 +2,7 @@
 'use client';
 import { useState } from "react";
 import cities from 'cities.json';
-import { scraper } from "../api/scraper/route";
+// import { scraper } from "../api/scraper/route";
 
 export default function Form() {
     const list = ['Barbecue', 'Vegetarian', 'Vegan', 'Pizza', 'Cafe', 'Sea Food', 'Street Food', 'Fast Food', 'Sushi', 
@@ -43,7 +43,20 @@ export default function Form() {
                 country: checkCity[1],
                 amount: range
             }
-            scraper(data);
+
+            try {
+                await fetch(`/api/scraper`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify( data ),
+                });
+            } catch (error) {
+                // Handle any request or network error
+            }
+
+            // scraper(data);
     
         } else {
             // throw error <<<<<<<<<<<<<-------------------------------------------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!
