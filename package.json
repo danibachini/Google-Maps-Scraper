@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
     "cities.json": "^1.1.25",
     "next": "13.5.4",
     "puppeteer": "^21.3.8",

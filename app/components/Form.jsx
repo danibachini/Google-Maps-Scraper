@@ -7,7 +7,7 @@ import cities from 'cities.json';
 export default function Form() {
     const list = ['Barbecue', 'Vegetarian', 'Vegan', 'Pizza', 'Cafe', 'Sea Food', 'Street Food', 'Fast Food', 'Sushi', 
     'Chinese', 'Thai', 'Mexican', 'American', 'Indian', 'Japanese', 'Spanish', 'Korean', 'French', 'Italian', 'Greek', 
-    'Mediterranean', 'European', 'Lebanese', 'Turkey'];
+    'Mediterranean', 'European', 'Lebanese', 'Turkey', 'Vietnamese'];
     const [buttonName, setButtonName] = useState('Select Cuisine');
     const [open, setOpen] = useState(false);
     const [openCity, setOpenCity] = useState(false);
