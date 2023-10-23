@@ -33,81 +33,69 @@ export async function POST(req) {
 
             const html = await page.content();
             const pages = await browser.pages();
-            await Promise.all(pages.map((page) => page.close()));
+            // await Promise.all(pages.map((page) => page.close()));
 
-            await browser.close();
-            console.log("browser closed");
+            // await browser.close();
+            // console.log("browser closed");
 
-            // get all a tag parent where a tag href includes /maps/place/
+            // get all 'a' tag parent where the 'a' tag href includes /maps/place/
             const $ = cheerio.load(html);
             const aTags = $("a");
             const parents = [];
+
             aTags.each((i, el) => {
-            const href = $(el).attr("href");
-            if (!href) {
-                return;
-            }
-            if (href.includes("/maps/place/")) {
-                parents.push($(el).parent());
-            }
+                const href = $(el).attr("href");
+                if (!href) {
+                    return;
+                }
+                if (href.includes("/maps/place/")) {
+                    parents.push($(el).parent());
+                }
             });
 
             console.log("parents", parents.length);
 
-            const placesUrls = [];
+            const places = [];
 
-            parents.forEach((parent) => {
-              const url = parent.find("a").attr("href");
-              placesUrls.push({
-                placeUrl: url,
-              });
-              
-            //   const website = parent.find('a[data-value="Website"]').attr("href");
-            //   const storeName = parent.find("div.fontHeadlineSmall").text();
-            //   const ratingText = parent
-            //     .find("span.fontBodyMedium > span")
-            //     .attr("aria-label");
+            // parents.forEach(async (parent) => {
+            // await Promise.all(parents.map(async (parent) => {
+            for (const parent of parents) {
+                const url = parent.find("a").attr("href");
+                const storeName = parent.find("div.fontHeadlineSmall").text();
+                const ratingText = parent.find("span.fontBodyMedium > span").attr("aria-label");
+                const rating = ratingText?.split("stars")?.[0]?.trim()
+                const numberOfReviews = ratingText?.split("stars")?.[1]?.replace("Reviews", "")?.trim();
 
-            //     // get the first div that includes the class fontBodyMedium
-            //     const bodyDiv = parent.find("div.fontBodyMedium").first();
-            //     const children = bodyDiv.children();
-            //     const lastChild = children.last();
-            //     const firstOfLast = lastChild.children().first();
-            //     const lastOfLast = lastChild.children().last(); 
-            //     // console.log('this is bodydiv: ',bodyDiv);
+                // scrape additional information from each place page
+                const additionalInfo = await eachPlacePage(page, url);
 
-            //     // console.log('LAST OF LAST: ', firstOfLast?.text().split("·"));
+                places.push({
+                    name: storeName,
+                    totalRating: rating,
+                    amountOfReviews: numberOfReviews,
+                    otherInfo: additionalInfo,
+                    // placeUrl: url,
+                });
 
-            //     console.log('ONE THAT MATCH: ', parent.find("div.fontBodyMedium").children);
-            //     // console.log(lastOfLast.text);
-
-            //     places.push({
-            //         address: firstOfLast?.text()?.split("·")?.[1]?.trim(),
-            //         phone: lastOfLast?.text()?.split("·")?.[1]?.trim(),
-            //         googleUrl: url,
-            //         bizWebsite: website,
-            //         storeName,
-            //         // ratingText,
-            //         stars: ratingText?.split("stars")?.[0]?.trim()
-            //         ? Number(ratingText?.split("stars")?.[0]?.trim())
-            //         : null,
-            //         numberOfReviews: ratingText
-            //         ?.split("stars")?.[1]
-            //         ?.replace("Reviews", "")
-            //         ?.trim()
-            //         ? Number(
-            //             ratingText?.split("stars")?.[1]?.replace("Reviews", "")?.trim()
-            //             )
-            //         : null,
-            //     });
-        });
+            };
+            // });
+            // }));
         
-        console.log(placesUrls);
+        
+        console.log(places);
 
+// TOTAL INFO: name, rating, amount of reviews, address, phone and website
+// autoscrolling the page and adding the places to the list up to the max amount of places defined by the user
+// then, in the map, get the url of each place 
+// for each url, still in the map, go to the url page
+// grab the info street address, website (if available), and phone (if available)
+// then go to the next place and repeat the process
 
 
         }, 3000);
-
+        
+        // await browser.close();
+        // console.log("browser closed");
 
         return NextResponse.json({message: "Success"});
     } else {
@@ -118,31 +106,32 @@ export async function POST(req) {
 
 }
 
+// address is fontBodyMedium n. 5 or 3
+// website is fontBodyMedium n. 10 or 8
+// phone number is fontBodyMedium n. 11 or 9
 
+async function eachPlacePage(page, url) {
 
-// async function parsePlaces(page) {
+    try {
+        await page.goto(url);
+        const html = await page.content();
+        const $ = cheerio.load(html);
+        const divTags = $('div.fontBodyMedium');
 
-//     let places = [];
-//     console.log('inside parsePlaces');
-//     const elements = await page.$$('.fontHeadlineSmall div');
-//     console.log('those are the elements', elements);
+        const addressDiv = divTags[3].children[0].data;
+        const websiteDiv = divTags[7].children[0].data
+        const phoneDiv = divTags[8].children[0].data
 
-//     // if (elements && elements.length) {
-//     //     console.log('inside if elements');
-//     //     elements.map(async (place) => {
-//     //         const name = await place.evaluate(div => div.innerHTML);
+        console.log('This is the address: ', addressDiv );
+        console.log('This is the Website: ', websiteDiv );
+        console.log('This is the phone number: ', phoneDiv);
 
-//     //         places.push({ name });
-//     //     })
-//     // }
+        return "Success"; // Or whatever you want to return upon success
 
-//     // return places; 
-// }
+    } catch (error) {
+        console.error(`Error while processing ${url} - This is the error: ${error}`);
+        return "Error"; // Or an error indicator
+    }
 
+}
 
-
-// fontHeadlineSmall
-// inside of it, I have to get the innerHTML (this is the name of the place)
-
-// ${data.cuisine}+${data.city}+${data.country}
-// https://www.google.com/maps/search/sushi (word + word)
