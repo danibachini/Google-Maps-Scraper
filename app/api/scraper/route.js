@@ -8,7 +8,6 @@ export async function POST(req) {
     if (req.method === 'POST') {
         const data = await req.json();
         console.log('API - data inside if:', data);
-        // console.log('this is the cuisine: ', data.cuisine);
 
         const browser = await puppeteer.launch({headless: false});
         const page = await browser.newPage();
@@ -25,11 +24,7 @@ export async function POST(req) {
         await page.click('[aria-label="Accept all"]');
 
         setTimeout(async function () {
-            // Your code here
             console.log("This code runs after 2 seconds");
-            // console.log(page);
-            // const places =  await parsePlaces(page); 
-            // console.log(places);
 
             const html = await page.content();
             const pages = await browser.pages();
@@ -53,12 +48,9 @@ export async function POST(req) {
                 }
             });
 
-            console.log("parents", parents.length);
+            // console.log("parents", parents.length);
 
             const places = [];
-
-            // parents.forEach(async (parent) => {
-            // await Promise.all(parents.map(async (parent) => {
             for (const parent of parents) {
                 const url = parent.find("a").attr("href");
                 const storeName = parent.find("div.fontHeadlineSmall").text();
@@ -74,12 +66,9 @@ export async function POST(req) {
                     totalRating: rating,
                     amountOfReviews: numberOfReviews,
                     otherInfo: additionalInfo,
-                    // placeUrl: url,
                 });
 
             };
-            // });
-            // }));
         
         
         console.log(places);
@@ -106,10 +95,6 @@ export async function POST(req) {
 
 }
 
-// address is fontBodyMedium n. 5 or 3
-// website is fontBodyMedium n. 10 or 8
-// phone number is fontBodyMedium n. 11 or 9
-
 async function eachPlacePage(page, url) {
 
     try {
@@ -119,11 +104,13 @@ async function eachPlacePage(page, url) {
         const divTags = $('div.fontBodyMedium');
 
         const addressDiv = divTags[3].children[0].data;
-        const websiteDiv = divTags[7].children[0].data
-        const phoneDiv = divTags[8].children[0].data
+        const buttonPhone = $('button.CsEnBe[data-tooltip="Copy phone number"]');
+        const phoneDiv = buttonPhone.attr('aria-label')?.split(":")?.[1];
+        const buttonwebsite = $('a.CsEnBe[data-tooltip="Open website"]');
+        const websiteDiv = buttonwebsite.attr('aria-label')?.split(":")?.[1];
 
-        console.log('This is the address: ', addressDiv );
-        console.log('This is the Website: ', websiteDiv );
+        console.log('This is the address: ', addressDiv);
+        console.log('This is the Website: ', websiteDiv);
         console.log('This is the phone number: ', phoneDiv);
 
         return "Success"; // Or whatever you want to return upon success
@@ -134,4 +121,3 @@ async function eachPlacePage(page, url) {
     }
 
 }
-
