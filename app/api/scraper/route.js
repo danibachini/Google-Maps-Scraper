@@ -60,18 +60,19 @@ export async function POST(req) {
 
                 // scrape additional information from each place page
                 const additionalInfo = await eachPlacePage(page, url);
-
+                
                 places.push({
                     name: storeName,
                     totalRating: rating,
                     amountOfReviews: numberOfReviews,
-                    otherInfo: additionalInfo,
+                    address: additionalInfo[0].address,
+                    website: additionalInfo[0].website,
+                    phone: additionalInfo[0].phone,
                 });
 
             };
-        
-        
-        console.log(places);
+
+            console.log(places);
 
 // TOTAL INFO: name, rating, amount of reviews, address, phone and website
 // autoscrolling the page and adding the places to the list up to the max amount of places defined by the user
@@ -107,13 +108,17 @@ async function eachPlacePage(page, url) {
         const buttonPhone = $('button.CsEnBe[data-tooltip="Copy phone number"]');
         const phoneDiv = buttonPhone.attr('aria-label')?.split(":")?.[1];
         const buttonwebsite = $('a.CsEnBe[data-tooltip="Open website"]');
-        const websiteDiv = buttonwebsite.attr('aria-label')?.split(":")?.[1];
+        // const websiteDiv = buttonwebsite.attr('aria-label')?.split(":")?.[1];
+        const websiteDiv = buttonwebsite.attr("href");
 
-        console.log('This is the address: ', addressDiv);
-        console.log('This is the Website: ', websiteDiv);
-        console.log('This is the phone number: ', phoneDiv);
+        let data = [];
+        data.push({
+            address: addressDiv,
+            website: websiteDiv,
+            phone: phoneDiv
+        })
 
-        return "Success"; // Or whatever you want to return upon success
+        return data; // Or whatever you want to return upon success
 
     } catch (error) {
         console.error(`Error while processing ${url} - This is the error: ${error}`);
