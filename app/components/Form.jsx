@@ -134,14 +134,12 @@ export default function Form() {
 
                 {/* range to select how many restaurants to display - min of 5 and max of 30 */}
                 <div>
-                    <input type="range" min={5} max="30" value={range} onChange={handleRangeChange} className="range" step="5" />
+                    <input type="range" min={5} max="20" value={range} onChange={handleRangeChange} className="range" step="5" />
                     <div className="w-52 flex justify-between text-xs px-2 text-white">
                         <span value={5}>5</span>
                         <span value={10}>10</span>
                         <span value={15}>15</span>
                         <span value={20}>20</span>
-                        <span value={25}>25</span>
-                        <span value={30}>30</span>
                     </div>
                 </div>
 
