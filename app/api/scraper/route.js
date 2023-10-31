@@ -5,27 +5,28 @@ import { NextResponse } from "next/server";
 
 export async function POST(req) {
 
-    if (req.method === 'POST') {
-        const data = await req.json();
-        console.log('API - data inside if:', data);
+    try {
+        if (req.method === 'POST') {
+            const data = await req.json();
+            console.log('API - data inside if:', data);
+    
+            const browser = await puppeteer.launch({headless: false});
+            const page = await browser.newPage();
+    
+            await page.setViewport({
+                width: 1300,
+                height: 900
+            });
+    
+            await page.goto(`https://www.google.com/maps/search/${data.cuisine}+restaurant+${data.city}+${data.country}`);
+    
+            // accept the cookies automatically
+            await page.waitForSelector('[aria-label="Accept all"]', { visible: true });
+            await page.click('[aria-label="Accept all"]');
 
-        const browser = await puppeteer.launch({headless: false});
-        const page = await browser.newPage();
-
-        await page.setViewport({
-            width: 1300,
-            height: 900
-        });
-
-        await page.goto(`https://www.google.com/maps/search/${data.cuisine}+restaurant+${data.city}+${data.country}`);
-
-        // accept the cookies automatically
-        await page.waitForSelector('[aria-label="Accept all"]', { visible: true });
-        await page.click('[aria-label="Accept all"]');
-
-        setTimeout(async function () {
-            console.log("This code runs after 2 seconds");
-
+            // this timeout is to wait accepting the cookies
+            await new Promise(resolve => setTimeout(resolve, 3000));
+    
             const amount = data.amount;
 
             async function autoScroll (page, amount) {
@@ -96,13 +97,15 @@ export async function POST(req) {
 
             };
 
-            console.log(places);
             await browser.close();
+            return NextResponse.json({message: "Success", places});
 
-        }, 3000);
+        } else {
+            return NextResponse.json({message: "Failed"});
+        }
 
-        return NextResponse.json({message: "Success"});
-    } else {
+    } catch (error) {
+        console.log(error);
         return NextResponse.json({message: "Failed"});
     }
 }

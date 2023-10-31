@@ -1,5 +1,5 @@
-
 'use client';
+
 import { useState } from "react";
 import cities from 'cities.json';
 // import { scraper } from "../api/scraper/route";
@@ -13,7 +13,7 @@ export default function Form() {
     const [openCity, setOpenCity] = useState(false);
     const [value, setValue] = useState('');
     const [search, setSearch] = useState(false);
-    const [range, setRange] = useState(15);
+    const [range, setRange] = useState(5);
 
     // set true/false for displaying the dropdown with the cities options
     const onChange = (e) => {
@@ -45,22 +45,27 @@ export default function Form() {
             }
 
             try {
-                await fetch(`/api/scraper`, {
+                const response = await fetch(`/api/scraper`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify( data ),
                 });
-            } catch (error) {
-                // Handle any request or network error
-            }
 
-            // scraper(data);
+                const result = await response.json();
+                console.log('Response in the Form: ', result);
+
+                if (result.message == "Success") {
+                    window.localStorage.setItem("places", JSON.stringify(result.places));
+                }
+
+            } catch (error) {
+                console.log(error);
+            }
     
         } else {
-            // throw error <<<<<<<<<<<<<-------------------------------------------------------------------------!!!!!!!!!!!!!!!!!!!!!!!!!
-            console.log('not yet');
+            console.log('Error');
         }
     }
 
@@ -132,7 +137,7 @@ export default function Form() {
                     <p className="text-white ">Amount of Options:</p>
                 </div>
 
-                {/* range to select how many restaurants to display - min of 5 and max of 30 */}
+                {/* range to select how many restaurants to display */}
                 <div>
                     <input type="range" min={5} max="20" value={range} onChange={handleRangeChange} className="range" step="5" />
                     <div className="w-52 flex justify-between text-xs px-2 text-white">
