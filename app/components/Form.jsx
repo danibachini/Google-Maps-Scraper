@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import cities from 'cities.json';
-// import { scraper } from "../api/scraper/route";
 
 export default function Form() {
     const list = ['Barbecue', 'Vegetarian', 'Vegan', 'Pizza', 'Cafe', 'Sea Food', 'Street Food', 'Fast Food', 'Sushi', 
@@ -54,11 +53,10 @@ export default function Form() {
                 });
 
                 const result = await response.json();
-                console.log('Response in the Form: ', result);
-
                 if (result.message == "Success") {
                     window.localStorage.setItem("places", JSON.stringify(result.places));
                 }
+                window.location.reload();
 
             } catch (error) {
                 console.log(error);
